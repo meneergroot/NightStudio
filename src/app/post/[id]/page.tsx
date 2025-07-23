@@ -37,6 +37,12 @@ export default function PostPage() {
 
   const fetchPost = useCallback(async () => {
     try {
+      if (!supabase) {
+        console.warn('Supabase client not initialized');
+        router.push('/');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -98,6 +104,10 @@ export default function PostPage() {
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      if (!supabase) {
+        throw new Error('Supabase client not initialized');
+      }
+
       // Record purchase in database
       const { error } = await supabase
         .from('purchases')

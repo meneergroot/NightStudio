@@ -3,6 +3,11 @@ import PostCard from '@/components/PostCard';
 import { supabase } from '@/lib/supabase';
 
 async function getPosts() {
+  if (!supabase) {
+    console.warn('Supabase client not initialized');
+    return [];
+  }
+
   try {
     const { data: posts, error } = await supabase
       .from('posts')

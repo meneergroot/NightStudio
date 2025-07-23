@@ -85,6 +85,10 @@ export default function UploadPage() {
     setIsUploading(true);
 
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not initialized');
+      }
+
       // Upload file to Supabase Storage
       const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;

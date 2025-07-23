@@ -12,6 +12,11 @@ interface ProfilePageProps {
 }
 
 async function getProfile(username: string) {
+  if (!supabase) {
+    console.warn('Supabase client not initialized');
+    return null;
+  }
+
   try {
     const { data: user, error } = await supabase
       .from('users')
@@ -31,6 +36,11 @@ async function getProfile(username: string) {
 }
 
 async function getProfilePosts(creatorId: string) {
+  if (!supabase) {
+    console.warn('Supabase client not initialized');
+    return [];
+  }
+
   try {
     const { data: posts, error } = await supabase
       .from('posts')
@@ -58,6 +68,11 @@ async function getProfilePosts(creatorId: string) {
 }
 
 async function getFollowerCount(userId: string) {
+  if (!supabase) {
+    console.warn('Supabase client not initialized');
+    return 0;
+  }
+
   try {
     const { count, error } = await supabase
       .from('followers')
