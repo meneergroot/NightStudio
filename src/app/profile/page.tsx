@@ -1,13 +1,14 @@
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import Navigation from '@/components/Navigation';
 import PostCard from '@/components/PostCard';
 import { supabase } from '@/lib/supabase';
 import { User, Users, DollarSign, Calendar } from 'lucide-react';
 
 interface ProfilePageProps {
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
 }
 
 async function getProfile(username: string) {
@@ -76,7 +77,8 @@ async function getFollowerCount(userId: string) {
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
-  const profile = await getProfile(params.username);
+  const resolvedParams = await params;
+  const profile = await getProfile(resolvedParams.username);
   
   if (!profile) {
     notFound();
@@ -99,9 +101,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               {/* Avatar */}
               <div className="w-24 h-24 rounded-full bg-solana-gradient p-1">
                 {profile.avatar_url ? (
-                  <img
+                  <Image
                     src={profile.avatar_url}
                     alt={profile.username}
+                    width={96}
+                    height={96}
                     className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
@@ -157,7 +161,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 <div className="bg-solana-gray rounded-lg p-8">
                   <h3 className="text-xl font-semibold text-white mb-2">No posts yet</h3>
                   <p className="text-gray-400">
-                    @{profile.username} hasn't uploaded any content yet.
+                    @{profile.username} hasn&apos;t uploaded any content yet.
                   </p>
                 </div>
               </div>

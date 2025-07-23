@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Navigation from '@/components/Navigation';
 import { supabase } from '@/lib/supabase';
-import { Lock, Unlock, Eye, DollarSign, User, ArrowLeft, Calendar } from 'lucide-react';
+import { Lock, Unlock, Eye, User, ArrowLeft, Calendar } from 'lucide-react';
 import { formatUSDC } from '@/lib/solana';
 import Link from 'next/link';
 
@@ -34,11 +35,7 @@ export default function PostPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUnlocking, setIsUnlocking] = useState(false);
 
-  useEffect(() => {
-    fetchPost();
-  }, [params.id]);
-
-  const fetchPost = async () => {
+  const fetchPost = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('posts')
@@ -79,7 +76,11 @@ export default function PostPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id, publicKey, router]);
+
+  useEffect(() => {
+    fetchPost();
+  }, [fetchPost]);
 
   const handleUnlock = async () => {
     if (!publicKey) {
@@ -170,10 +171,11 @@ export default function PostPage() {
                       className={`w-full h-full object-cover ${!isUnlocked && post.is_locked ? 'blur-sm' : ''}`}
                     />
                   ) : (
-                    <img
+                    <Image
                       src={post.media_url}
                       alt={post.title}
-                      className={`w-full h-full object-cover ${!isUnlocked && post.is_locked ? 'blur-sm' : ''}`}
+                      fill
+                      className={`object-cover ${!isUnlocked && post.is_locked ? 'blur-sm' : ''}`}
                     />
                   )}
                 </>
@@ -208,9 +210,11 @@ export default function PostPage() {
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-full bg-solana-gradient p-0.5">
                   {post.users.avatar_url ? (
-                    <img
+                    <Image
                       src={post.users.avatar_url}
                       alt={post.users.username}
+                      width={48}
+                      height={48}
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
@@ -221,7 +225,7 @@ export default function PostPage() {
                 </div>
                 <div>
                   <Link 
-                    href={`/@${post.users.username}`}
+                    href={`/profile/${post.users.username}`}
                     className="text-solana-green font-semibold hover:underline text-lg"
                   >
                     @{post.users.username}

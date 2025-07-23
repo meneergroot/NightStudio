@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Navigation from '@/components/Navigation';
-import { Upload, DollarSign, Lock, Image as ImageIcon, Video, X } from 'lucide-react';
+import { Upload, DollarSign, Lock, Image as ImageIcon, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function UploadPage() {
@@ -19,10 +20,33 @@ export default function UploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Redirect if not connected
+  useEffect(() => {
+    if (!publicKey) {
+      router.push('/');
+    } else {
+      setIsLoading(false);
+    }
+  }, [publicKey, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-solana-dark">
+        <Navigation />
+        <div className="pt-16 pb-8">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-solana-green mx-auto"></div>
+              <p className="text-gray-300 mt-4">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!publicKey) {
-    router.push('/');
     return null;
   }
 
@@ -66,7 +90,7 @@ export default function UploadPage() {
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `uploads/${publicKey.toString()}/${fileName}`;
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('media')
         .upload(filePath, selectedFile);
 
@@ -128,10 +152,11 @@ export default function UploadPage() {
                     <div className="relative">
                       <div className="aspect-video bg-solana-dark rounded-lg overflow-hidden mb-4">
                         {selectedFile?.type.startsWith('image/') ? (
-                          <img
+                          <Image
                             src={previewUrl}
                             alt="Preview"
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
                           />
                         ) : (
                           <video

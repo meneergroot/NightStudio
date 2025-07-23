@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { Menu, X, Upload, Home, User, Search } from 'lucide-react';
+import { Menu, X, Upload, Home, User } from 'lucide-react';
 import { formatSolanaAddress } from '@/lib/solana';
 
 export default function Navigation() {
@@ -52,7 +52,7 @@ export default function Navigation() {
               
               {publicKey && (
                 <Link 
-                  href={`/@${formatSolanaAddress(publicKey.toString())}`}
+                  href={`/profile/${formatSolanaAddress(publicKey.toString())}`}
                   className="text-gray-300 hover:text-solana-green transition-colors duration-200 flex items-center space-x-2"
                 >
                   <User size={20} />
@@ -99,7 +99,7 @@ export default function Navigation() {
 
               {publicKey && (
                 <Link 
-                  href={`/@${formatSolanaAddress(publicKey.toString())}`}
+                  href={`/profile/${formatSolanaAddress(publicKey.toString())}`}
                   className="block px-3 py-2 text-gray-300 hover:text-solana-green transition-colors duration-200 flex items-center space-x-2"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

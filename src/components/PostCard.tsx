@@ -116,7 +116,7 @@ export default function PostCard({ post }: PostCardProps) {
           </div>
           <div>
             <Link 
-              href={`/@${post.users.username}`}
+              href={`/profile/${post.users.username}`}
               className="text-solana-green font-semibold hover:underline"
             >
               @{post.users.username}
