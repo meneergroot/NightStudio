@@ -1,171 +1,100 @@
-'use client';
-
-import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { Lock, Unlock, Eye, DollarSign, User } from 'lucide-react';
-import { formatUSDC } from '@/lib/solana';
-
-interface Post {
-  id: string;
-  title: string;
-  teaser_text: string;
-  media_url: string;
-  price_usdc: number;
-  is_locked: boolean;
-  created_at: string;
-  users: {
-    username: string;
-    avatar_url: string | null;
-    bio: string | null;
-  };
-}
+import React from 'react';
+import { Heart, MessageCircle, Clock, Lock, CheckCircle } from 'lucide-react';
+import { Post } from '../types';
 
 interface PostCardProps {
   post: Post;
+  onUnlock: (postId: string) => void;
 }
 
-export default function PostCard({ post }: PostCardProps) {
-  const { publicKey } = useWallet();
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleUnlock = async () => {
-    if (!publicKey) {
-      alert('Please connect your wallet first');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // TODO: Implement Solana payment logic
-      console.log('Unlocking post:', post.id, 'Price:', post.price_usdc);
-      
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setIsUnlocked(true);
-    } catch (error) {
-      console.error('Error unlocking post:', error);
-      alert('Failed to unlock content. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+const PostCard: React.FC<PostCardProps> = ({ post, onUnlock }) => {
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    return `${Math.floor(diffInHours / 24)}d ago`;
   };
 
   return (
-    <div className="bg-solana-gray rounded-lg overflow-hidden border border-solana-light-gray hover:border-solana-green/50 transition-all duration-300">
-      {/* Media Section */}
-      <div className="relative aspect-video bg-solana-dark">
-        {post.media_url ? (
-          <Image
-            src={post.media_url}
-            alt={post.title}
-            fill
-            className={`object-cover ${!isUnlocked && post.is_locked ? 'blur-sm' : ''}`}
+    <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-all duration-300">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 pb-3">
+        <div className="flex items-center space-x-3">
+          <img
+            src={post.creator.avatar}
+            alt={post.creator.displayName}
+            className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-700"
           />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-solana-dark">
-            <Eye className="w-12 h-12 text-gray-500" />
-          </div>
-        )}
-        
-        {/* Lock overlay for locked content */}
-        {post.is_locked && !isUnlocked && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="text-center">
-              <Lock className="w-12 h-12 text-solana-green mx-auto mb-2" />
-              <p className="text-white font-semibold">Premium Content</p>
-              <p className="text-gray-300 text-sm">Unlock to view</p>
+          <div>
+            <div className="flex items-center space-x-2">
+              <h3 className="text-white font-semibold">{post.creator.displayName}</h3>
+              {post.creator.verified && (
+                <CheckCircle size={16} className="text-[#00FFA3]" />
+              )}
             </div>
+            <p className="text-gray-400 text-sm">@{post.creator.username}</p>
           </div>
-        )}
+        </div>
+        <div className="flex items-center text-gray-500 text-sm">
+          <Clock size={14} className="mr-1" />
+          {formatTimeAgo(post.timestamp)}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="px-4 pb-3">
+        <p className="text-gray-300 leading-relaxed">
+          {post.isUnlocked ? post.content : `${post.content.slice(0, 120)}...`}
+        </p>
+      </div>
+
+      {/* Image */}
+      <div className="relative">
+        <img
+          src={post.image}
+          alt="Post content"
+          className={`w-full h-64 sm:h-80 object-cover ${
+            !post.isUnlocked ? 'filter blur-sm brightness-50' : ''
+          }`}
+        />
         
-        {/* Price badge */}
-        {post.is_locked && (
-          <div className="absolute top-4 right-4 bg-solana-gradient px-3 py-1 rounded-full">
-            <div className="bg-solana-dark px-2 py-1 rounded-full">
-              <span className="text-solana-green font-semibold text-sm flex items-center gap-1">
-                <DollarSign size={14} />
-                {formatUSDC(post.price_usdc)}
-              </span>
-            </div>
+        {!post.isUnlocked && (
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <button
+              onClick={() => onUnlock(post.id)}
+              className="bg-gradient-to-r from-[#00FFA3] to-[#DC1FFF] text-black px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 hover:shadow-lg hover:shadow-[#00FFA3]/25 transition-all duration-300 transform hover:scale-105"
+            >
+              <Lock size={18} />
+              <span>Unlock for {post.price} {post.currency}</span>
+            </button>
           </div>
         )}
       </div>
 
-      {/* Content Section */}
-      <div className="p-6">
-        {/* Creator Info */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-solana-gradient p-0.5">
-            {post.users.avatar_url ? (
-              <Image
-                src={post.users.avatar_url}
-                alt={post.users.username}
-                width={40}
-                height={40}
-                className="rounded-full"
-              />
-            ) : (
-              <div className="w-full h-full rounded-full bg-solana-dark flex items-center justify-center">
-                <User className="w-5 h-5 text-solana-green" />
-              </div>
-            )}
-          </div>
-          <div>
-            <Link 
-              href={`/profile/${post.users.username}`}
-              className="text-solana-green font-semibold hover:underline"
-            >
-              @{post.users.username}
-            </Link>
-            <p className="text-gray-400 text-sm">
-              {new Date(post.created_at).toLocaleDateString()}
-            </p>
-          </div>
+      {/* Actions */}
+      <div className="flex items-center justify-between p-4">
+        <div className="flex items-center space-x-6">
+          <button className="flex items-center space-x-2 text-gray-400 hover:text-red-500 transition-colors">
+            <Heart size={20} />
+            <span className="text-sm">{post.likes}</span>
+          </button>
+          <button className="flex items-center space-x-2 text-gray-400 hover:text-[#00FFA3] transition-colors">
+            <MessageCircle size={20} />
+            <span className="text-sm">{post.comments}</span>
+          </button>
         </div>
-
-        {/* Post Title */}
-        <h3 className="text-xl font-bold text-white mb-3">{post.title}</h3>
-
-        {/* Post Content */}
-        <p className="text-gray-300 mb-4 line-clamp-3">
-          {isUnlocked ? post.teaser_text : `${post.teaser_text.substring(0, 100)}...`}
-        </p>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3">
-          {post.is_locked && !isUnlocked ? (
-            <button
-              onClick={handleUnlock}
-              disabled={isLoading}
-              className="flex-1 bg-solana-gradient hover:opacity-90 disabled:opacity-50 transition-opacity duration-200 rounded-lg px-4 py-3 text-solana-dark font-semibold flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-solana-dark border-t-transparent rounded-full animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <Unlock size={18} />
-                  Unlock Content
-                </>
-              )}
-            </button>
-          ) : (
-            <Link
-              href={`/post/${post.id}`}
-              className="flex-1 bg-solana-gradient hover:opacity-90 transition-opacity duration-200 rounded-lg px-4 py-3 text-solana-dark font-semibold flex items-center justify-center gap-2"
-            >
-              <Eye size={18} />
-              View Full Post
-            </Link>
-          )}
-        </div>
+        
+        {post.isUnlocked && (
+          <div className="flex items-center text-[#00FFA3] text-sm font-medium">
+            <CheckCircle size={16} className="mr-1" />
+            Unlocked
+          </div>
+        )}
       </div>
     </div>
   );
-} 
+};
+
+export default PostCard;
