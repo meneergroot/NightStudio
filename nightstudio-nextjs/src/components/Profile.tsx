@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { MapPin, Calendar, Users, UserPlus, Settings, CheckCircle } from 'lucide-react';
 import { mockUsers, mockPosts } from '../data/mockData';

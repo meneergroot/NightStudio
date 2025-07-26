@@ -1,33 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { WalletContextProvider } from './lib/wallet';
+import { useWallet } from './lib/useWallet';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Upload from './components/Upload';
 import Profile from './components/Profile';
-import { WalletState } from './types';
 
-function App() {
-  const [wallet, setWallet] = useState<WalletState>({
-    connected: false,
-    address: null,
-    balance: { sol: 0, usdc: 0 }
-  });
+function AppContent() {
+  const { wallet, connectWallet, disconnectWallet, loading } = useWallet();
 
   const handleWalletConnect = () => {
     if (wallet.connected) {
-      // Disconnect wallet
-      setWallet({
-        connected: false,
-        address: null,
-        balance: { sol: 0, usdc: 0 }
-      });
+      disconnectWallet();
     } else {
-      // Mock wallet connection - in real app, integrate with Solana wallet adapter
-      setWallet({
-        connected: true,
-        address: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
-        balance: { sol: 2.5, usdc: 150.75 }
-      });
+      connectWallet();
     }
   };
 
@@ -38,6 +25,7 @@ function App() {
           walletConnected={wallet.connected}
           walletAddress={wallet.address}
           onWalletConnect={handleWalletConnect}
+          loading={loading}
         />
         
         <Routes>
@@ -47,6 +35,14 @@ function App() {
         </Routes>
       </div>
     </Router>
+  );
+}
+
+function App() {
+  return (
+    <WalletContextProvider>
+      <AppContent />
+    </WalletContextProvider>
   );
 }
 

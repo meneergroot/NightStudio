@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { Heart, MessageCircle, Clock, Lock, CheckCircle } from 'lucide-react';
 import { Post } from '../types';
