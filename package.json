@@ -1,36 +1,42 @@
 {
-  "name": "nightstudio",
-  "version": "1.0.0",
+  "name": "vite-react-typescript-starter",
   "private": true,
-  "description": "NightStudio - Premium Content Sharing Platform with Solana Integration",
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@solana/wallet-adapter-base": "^0.9.23",
-    "@solana/wallet-adapter-react": "^0.15.35",
-    "@solana/wallet-adapter-react-ui": "^0.9.35",
-    "@solana/wallet-adapter-wallets": "^0.19.32",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/wallet-adapter-base": "^0.9.27",
+    "@solana/wallet-adapter-react": "^0.15.39",
+    "@solana/wallet-adapter-react-ui": "^0.9.39",
+    "@solana/wallet-adapter-wallets": "^0.19.37",
     "@solana/web3.js": "^1.98.2",
-    "@supabase/supabase-js": "^2.52.1",
+    "@types/react-router-dom": "^5.3.3",
     "framer-motion": "^12.23.9",
-    "lucide-react": "^0.525.0",
-    "next": "15.4.4",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "lucide-react": "^0.344.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.7.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "20.19.9",
-    "@types/react": "19.1.8",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.4.4",
-    "tailwindcss": "^4",
-    "typescript": "5.8.3"
+    "@eslint/js": "^9.9.1",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.18",
+    "eslint": "^9.9.1",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.11",
+    "globals": "^15.9.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.3.0",
+    "vite": "^5.4.2"
   }
 }

@@ -1,7 +1,7 @@
-'use client';
-
 import React from 'react';
 import { Heart, MessageCircle, Clock, Lock, CheckCircle } from 'lucide-react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useWalletBalance } from '../hooks/useWalletBalance';
 import { Post } from '../types';
 
 interface PostCardProps {
@@ -10,6 +10,9 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post, onUnlock }) => {
+  const { connected } = useWallet();
+  const { checkSufficientBalance } = useWalletBalance();
+
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
@@ -17,6 +20,21 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUnlock }) => {
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     return `${Math.floor(diffInHours / 24)}d ago`;
+  };
+
+  const handleUnlockClick = () => {
+    if (!connected) {
+      alert('Please connect your wallet first');
+      return;
+    }
+
+    const hasSufficientBalance = checkSufficientBalance(post.price, post.currency);
+    if (!hasSufficientBalance) {
+      alert(`Insufficient ${post.currency} balance. You need at least ${post.price} ${post.currency} to unlock this post.`);
+      return;
+    }
+
+    onUnlock(post.id);
   };
 
   return (
@@ -65,8 +83,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUnlock }) => {
         {!post.isUnlocked && (
           <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
             <button
-              onClick={() => onUnlock(post.id)}
-              className="bg-gradient-to-r from-[#00FFA3] to-[#DC1FFF] text-black px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 hover:shadow-lg hover:shadow-[#00FFA3]/25 transition-all duration-300 transform hover:scale-105"
+              onClick={handleUnlockClick}
+              className={`px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 transform hover:scale-105 ${
+                connected && checkSufficientBalance(post.price, post.currency)
+                  ? 'bg-gradient-to-r from-[#512da8] to-[#00ff9f] text-white hover:shadow-lg hover:shadow-[#00ff9f]/25'
+                  : 'bg-gray-700 text-gray-300 cursor-not-allowed'
+              }`}
             >
               <Lock size={18} />
               <span>Unlock for {post.price} {post.currency}</span>
@@ -89,7 +111,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUnlock }) => {
         </div>
         
         {post.isUnlocked && (
-          <div className="flex items-center text-[#00FFA3] text-sm font-medium">
+          <div className="flex items-center text-[#00ff9f] text-sm font-medium">
             <CheckCircle size={16} className="mr-1" />
             Unlocked
           </div>

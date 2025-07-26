@@ -1,5 +1,3 @@
-'use client';
-
 import React, { FC, ReactNode, useMemo } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
@@ -10,16 +8,16 @@ import { clusterApiUrl } from '@solana/web3.js';
 // Import wallet adapter CSS
 import '@solana/wallet-adapter-react-ui/styles.css';
 
-// Solana network configuration
-const SOLANA_NETWORK = (process.env.NEXT_PUBLIC_SOLANA_NETWORK as WalletAdapterNetwork) || WalletAdapterNetwork.Mainnet;
-const SOLANA_RPC_URL = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl(SOLANA_NETWORK);
-
 interface WalletContextProviderProps {
   children: ReactNode;
 }
 
-export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children }) => {
-  // Initialize wallets
+const WalletContextProvider: FC<WalletContextProviderProps> = ({ children }) => {
+  // Use mainnet-beta for production
+  const network = WalletAdapterNetwork.Mainnet;
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+
+  // Only support Phantom wallet
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
@@ -28,7 +26,7 @@ export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children
   );
 
   return (
-    <ConnectionProvider endpoint={SOLANA_RPC_URL}>
+    <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           {children}
@@ -36,4 +34,6 @@ export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children
       </WalletProvider>
     </ConnectionProvider>
   );
-}; 
+};
+
+export default WalletContextProvider;
