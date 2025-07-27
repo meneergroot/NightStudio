@@ -2,6 +2,7 @@ import React from 'react';
 import PostCard from './PostCard';
 import { mockPosts } from '../data/mockData';
 import { Sparkles } from 'lucide-react';
+import WalletTest from './WalletTest';
 
 const Home: React.FC = () => {
   const handleUnlock = (postId: string) => {
@@ -19,6 +20,11 @@ const Home: React.FC = () => {
             <h1 className="text-2xl font-bold text-white">Premium Feed</h1>
           </div>
           <p className="text-gray-400">Discover exclusive content from your favorite creators</p>
+        </div>
+
+        {/* Wallet Test Component */}
+        <div className="mb-8">
+          <WalletTest />
         </div>
 
         {/* Posts Feed */}

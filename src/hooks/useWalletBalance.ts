@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token';
@@ -21,7 +21,7 @@ export const useWalletBalance = () => {
     loading: false,
   });
 
-  const fetchBalances = async () => {
+  const fetchBalances = useCallback(async () => {
     if (!publicKey || !connection) {
       setBalance({ sol: 0, usdc: 0, loading: false });
       return;
@@ -58,11 +58,11 @@ export const useWalletBalance = () => {
       console.error('Error fetching balances:', error);
       setBalance({ sol: 0, usdc: 0, loading: false });
     }
-  };
+  }, [publicKey, connection]);
 
   useEffect(() => {
     fetchBalances();
-  }, [publicKey, connection]);
+  }, [publicKey, connection, fetchBalances]);
 
   // Utility function to check minimum balances
   const hasMinimumBalance = (): boolean => {

@@ -1,7 +1,11 @@
 import React, { FC, ReactNode, useMemo } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { 
+  PhantomWalletAdapter,
+  SolflareWalletAdapter,
+  CoinbaseWalletAdapter
+} from '@solana/wallet-adapter-wallets';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl } from '@solana/web3.js';
 
@@ -17,13 +21,18 @@ const WalletContextProvider: FC<WalletContextProviderProps> = ({ children }) => 
   const network = WalletAdapterNetwork.Mainnet;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
-  // Only support Phantom wallet
+  // Support multiple wallets but prioritize Phantom
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new CoinbaseWalletAdapter(),
     ],
     []
   );
+
+  console.log('WalletProvider initialized with endpoint:', endpoint);
+  console.log('Available wallets:', wallets.map(w => w.name));
 
   return (
     <ConnectionProvider endpoint={endpoint}>
