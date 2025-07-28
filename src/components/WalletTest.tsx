@@ -4,8 +4,12 @@ import { useWalletBalance } from '../hooks/useWalletBalance';
 import ConnectWalletButton from './ConnectWalletButton';
 
 const WalletTest: React.FC = () => {
-  const { publicKey, connected, connecting, disconnect } = useWallet();
+  const { publicKey, connected, connecting, disconnect, wallets, select } = useWallet();
   const { balance, hasMinimumBalance, refreshBalance } = useWalletBalance();
+
+  // Debug logging
+  console.log('WalletTest - Available wallets:', wallets.map(w => w.adapter.name));
+  console.log('WalletTest - Connection state:', { connected, connecting, publicKey: publicKey?.toString() });
 
   const formatAddress = (address: string) => {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
