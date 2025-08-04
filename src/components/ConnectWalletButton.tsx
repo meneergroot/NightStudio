@@ -1,29 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useWalletContext } from '../contexts/WalletContext';
 
 interface ConnectWalletButtonProps {
   className?: string;
 }
 
 const ConnectWalletButton: React.FC<ConnectWalletButtonProps> = ({ className = '' }) => {
-  const { connected, disconnect, publicKey } = useWallet();
+  const { connected, publicKey } = useWallet();
+  const { isConnected, walletAddress } = useWalletContext();
 
   // Debug logging
-  console.log('Wallet state:', { connected, publicKey: publicKey?.toString() });
-
-  // Force disconnect on component mount to clear any cached state
-  useEffect(() => {
-    const clearWalletCache = async () => {
-      // Clear any cached wallet state
-      if (connected && publicKey) {
-        console.log('Clearing cached wallet state...');
-        await disconnect();
-      }
-    };
-    
-    clearWalletCache();
-  }, []);
+  console.log('Wallet state:', { connected, isConnected, walletAddress, publicKey: publicKey?.toString() });
 
   return (
     <WalletMultiButton 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Calendar, UserPlus, Settings, CheckCircle, Edit } from 'lucide-react';
 import { mockUsers, mockPosts } from '../data/mockData';
 import PostCard from './PostCard';
-import { useWalletConnection } from '../hooks/useWalletConnection';
+import { useWalletContext } from '../contexts/WalletContext';
 import { UserService } from '../services/userService';
 import type { User } from '../types';
 
@@ -19,7 +19,7 @@ const Profile: React.FC = () => {
     coverPhoto: ''
   });
 
-  const { walletAddress, connected } = useWalletConnection();
+  const { walletAddress, isConnected: connected } = useWalletContext();
 
   // Fetch user profile based on wallet address
   useEffect(() => {
